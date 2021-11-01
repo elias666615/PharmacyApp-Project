@@ -11,8 +11,15 @@ class ProductsAPIView(APIView):
         return products
 
     def get(self, request, *args, **kwargs):
-        products = self.get_queryset()
-        serializer = ProductSerializer(products, many=True)
+        try:
+            id = request.query_params['id']
+            if id != None:
+                product = Product.objects.get(id=id)
+                serializer = ProductSerializer(product)
+        except:
+            products = self.get_queryset()
+            serializer = ProductSerializer(products, many=True)
+
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):

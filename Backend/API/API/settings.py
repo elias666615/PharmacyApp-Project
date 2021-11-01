@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'categories',
     'product',
+    'phonenumber_field',
+    'userapp',
 ]
 
 SITE_ID = 1
@@ -119,7 +121,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
         'rest_framework.permissions.AllowAny'
-    ]
+    ],
+    'USER_DETAILS_SERIALIZER': 'userapp.serializer.UserDetailsSerializer'
 }
 
 
@@ -146,3 +149,11 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTH_USER_MODEL = 'userapp.User'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
