@@ -2,7 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializer import ProductSerializer
 from product.models import Product
+from rest_framework.permissions import AllowAny
 
+[AllowAny]
 class ProductsAPIView(APIView):
     serializer_class = ProductSerializer
 
@@ -10,6 +12,7 @@ class ProductsAPIView(APIView):
         products = Product.objects.all()
         return products
 
+    [AllowAny]
     def get(self, request, *args, **kwargs):
         try:
             id = request.query_params['id']
