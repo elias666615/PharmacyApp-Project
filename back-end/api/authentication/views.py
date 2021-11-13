@@ -4,8 +4,8 @@ from rest_framework import generics, status
 from rest_framework import serializers
 from rest_framework.serializers import Serializer
 
-from .models import Card_Information, Country, Role, User
-from .serializers import CardInfoSerializer, CountrySerializer, RegisterSerializer, RoleSerializer, LoginSerializer
+from .models import Card_Information, Role, Store, User
+from .serializers import CardInfoSerializer, RegisterSerializer, RoleSerializer, LoginSerializer, StoreSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -88,31 +88,6 @@ class RolesAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class CountriesAPIView(APIView):
-    serializer_class = CountrySerializer
-
-    def get_queryset(self):
-        countries = Country.objects.all()
-        return countries
-
-    def get(self, request):
-        countries = self.get_queryset()
-        serializer = CountrySerializer(countries, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-    def post(self, request):
-        country_data = request.data
-        new_country = Country.objects.create(
-            code = country_data['code'],
-            description = country_data['description'],
-            phone_code = country_data['phone_code']
-        )
-        new_country.save()
-        serializer = CountrySerializer(new_country)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
 class CardInfoAPIView(APIView):
     serializer_class = CardInfoSerializer
 
@@ -138,3 +113,16 @@ class CardInfoAPIView(APIView):
         new_card.save()
         serializer = CardInfoSerializer(new_card)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class StoreAPIView(APIView):
+    serializer_class = StoreSerializer
+
+    def get_queryset(self):
+        stores = Store.objects.all()
+        return stores
+
+    def get(self, request):
+        stores = self.get_queryset()
+        serializer = StoreSerializer(stores, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

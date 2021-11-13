@@ -8,42 +8,35 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, email, password=None, first_name="admin", last_name="admin", phone_number="", country = None, role = None):
-        if username is None:
-            raise ValueError('Users should have a username')
+    def create_user(self, email, password, first_name="admin", last_name="admin", phone_number="", role = None, **extra_fields):
+        print('email: ' + email)
+        print('password: ', password)
         if email is None:
             raise ValueError('Users should have a Email')
 
-        _country = None
         _role = None
-        if country != None:
-            _country = Country.objects.get(code = country)
         if role != None:
             _role = Role.objects.get(code = role)
 
-        user = self.model(username=username, email=self.normalize_email(email), country = _country, role = _role, first_name=first_name, last_name=last_name, phone_number=phone_number)
+        user = self.model(email=self.normalize_email(email), role = _role, first_name=first_name, last_name=last_name, phone_number=phone_number)
+        print(password)
         user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self, username, email, password=None):
+    def create_superuser(self, email, password=None, **extra_fields):
+        print('email: ' + email)
+        print('password: ', password)
         if password is None:
             raise ValueError('Password should not be none')
     
-        user = self.create_user(username, email, password)
-        user = self.model(username=username, email=self.normalize_email(email))
+        user = self.create_user(email, password, **extra_fields)
+        print('user created')
+        # user = self.model(username=username, email=self.normalize_email(email))
         user.is_superuser = True
         user.is_staff  =True
         user.save()
         return user
-
-class Country(models.Model):
-    code = CharField(max_length=2, unique=True, blank=False, null=False)
-    description = CharField(max_length=30, unique=True, null=False, blank=False)
-    phone_code = CharField(max_length=10, unique=True, blank=False, null=False)
-
-    def __str__(self):
-        return self.description
 
 
 class Role(models.Model):
@@ -55,7 +48,7 @@ class Role(models.Model):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=225, unique=True, db_index=True)
+    username = None
     email = models.EmailField(max_length=225, unique=True, db_index=True)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -65,11 +58,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=30)
     first_name = models.CharField(max_length=30, null=False, blank=False, default="first_name")
     last_name = models.CharField(max_length=30, null=False, blank=False, default="last_name")
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = []
 
     objects = UserManager()
 
@@ -92,8 +84,14 @@ class Card_Information(models.Model):
     name_on_card = models.CharField(max_length=30, null=False, blank=False)
     cvv = models.CharField(max_length=3, null=False, blank=False)
 
+    def __str__(self):
+        return self.card_number
+
 
 class Store(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
     name = models.CharField(max_length=50, null=False, blank=False)
     location = models.TextField(null=False, blank=False)
+
+    def __str__(self):
+        return self.name

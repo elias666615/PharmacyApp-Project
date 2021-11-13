@@ -59,7 +59,7 @@ class Category(models.Model):
 
 
 class SubCategory(models.Model):
-    category = models.OneToOneField(Category, on_delete=models.CASCADE, null=False)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=False)
     description = models.CharField(max_length=30, null=False, blank=False, unique=True)
 
 

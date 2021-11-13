@@ -14,8 +14,8 @@ class RegisterSerializer(serializers.Serializer):
     country = serializers.CharField()
     role = serializers.CharField()
 
-    def validate_password1(self, password):
-        return get_adapter().clean_password(password)
+    def validate_password1(self, password1):
+        return get_adapter().clean_password(password1)
     
     def validate(self, data):
         if data['password1'] != data['password2']:
