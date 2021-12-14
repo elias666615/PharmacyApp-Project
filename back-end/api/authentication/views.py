@@ -1,11 +1,13 @@
+from re import A
 from django.db import models
 from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework import serializers
+from rest_framework.permissions import AllowAny
 from rest_framework.serializers import Serializer
 
 from .models import Card_Information, Role, Store, User
-from .serializers import CardInfoSerializer, RegisterSerializer, RoleSerializer, LoginSerializer, StoreSerializer
+from .serializers import CardInfoSerializer, RegisterSerializer, RoleSerializer, LoginSerializer, StoreSerializer, UserSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -17,9 +19,11 @@ from django.conf import settings
 
 class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
+
     def post(self, request):
-        user = request.data
-        serializer = self.serializer_class(data=user)
+        _user = request.data
+        serializer = self.serializer_class(data=_user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         user_data = serializer.data
@@ -47,15 +51,37 @@ class RegisterView(generics.GenericAPIView):
 
         # Util.sendEmail(data)
 
+        if _user['role'] == 'SLR':
+            print("*********** IT'S A SELLER ************")
+            print(_user['storename'])
+            print(_user['location'])
+            new_store = Store.objects.create(owner=user, name=_user['storename'], location=_user['location'])
+            new_store.save()
+
         return Response(user_data, status=status.HTTP_201_CREATED)
+
 
 
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         serializer=self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        
+        print(serializer.data)
 
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UserAPIView(APIView):
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        email = request.query_params['email']
+        user = User.objects.get(email = email)
+        serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -66,6 +92,7 @@ class VerifyEmail(generics.GenericAPIView):
 
 class RolesAPIView(APIView):
     serializer_class = RoleSerializer
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         roles = Role.objects.all()
@@ -90,6 +117,7 @@ class RolesAPIView(APIView):
 
 class CardInfoAPIView(APIView):
     serializer_class = CardInfoSerializer
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         cards = Card_Information.objects.all()
@@ -117,12 +145,14 @@ class CardInfoAPIView(APIView):
 
 class StoreAPIView(APIView):
     serializer_class = StoreSerializer
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         stores = Store.objects.all()
         return stores
 
     def get(self, request):
-        stores = self.get_queryset()
-        serializer = StoreSerializer(stores, many=True)
+        user_email = request.query_params['user']
+        store = Store.objects.get(owner__email = user_email)
+        serializer = StoreSerializer(store)
         return Response(serializer.data, status=status.HTTP_200_OK)
