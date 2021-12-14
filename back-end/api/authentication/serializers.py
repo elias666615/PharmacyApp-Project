@@ -25,11 +25,12 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.ModelSerializer):
     email=serializers.EmailField(max_length=255, min_length=3)
     password=serializers.CharField(max_length=68, min_length=6, write_only=True)
-    tokens=serializers.CharField(max_length=68, min_length=6, read_only=True)
+    Accesstoken=serializers.CharField(max_length=68, min_length=6, read_only=True)
+    Refreshtoken=serializers.CharField(max_length=68, min_length=6, read_only=True)
     
     class Meta:
         model=User
-        fields=['email', 'password', 'tokens']
+        fields=['email', 'password', 'Accesstoken', 'Refreshtoken']
 
     def validate(self, attrs):
         email=attrs.get('email', '')
@@ -45,10 +46,13 @@ class LoginSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed('Account disabled, contact admin')
         if not user.is_verified:
             raise AuthenticationFailed('Email is not verified')
-        
+
+        print(user.tokens()['access'])
+
         return {
             'email': user.email,
-            'tokens': user.tokens()
+            'Accesstoken': user.tokens()['access'],
+            'Refreshtoken': user.tokens()['refresh'],
         }
 
 
@@ -66,4 +70,11 @@ class CardInfoSerializer(serializers.ModelSerializer):
 class StoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Store
-        fields = ['id', 'owner', 'name', 'location']
+        fields = ['id', 'name', 'location']
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email', 'phone_number', 'first_name', 'last_name', 'role']
+        depth = 1
