@@ -63,6 +63,7 @@ class CategoryAPIView(APIView):
         category = Category.objects.get(id=data['id'])
         category.rating = data['rating']
         category.rating_num = data['rating_num']
+        return Response({'messag': 'category successfully updated'}, status=status.HTTP_200_OK)
 
 
 class TypeAPIView(APIView):
@@ -197,7 +198,8 @@ class RatingAPIView(APIView):
             rating_number=data['rating_number'],
             date_time=datetime.datetime.now())
         new_rating.save()
-        return Response({'message': 'rating successful posted'}, status=status.HTTP_200_OK)
+        serializer = RatingSerializer(new_rating)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ProductAPIView(APIView):
