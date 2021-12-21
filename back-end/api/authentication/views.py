@@ -29,6 +29,14 @@ class RegisterView(generics.GenericAPIView):
         user_data = serializer.data
 
         user=User.objects.get(email=user_data['email'])
+        print('**********************')
+        print(_user['city'])
+        print(_user['street'])
+        print(_user['location'])
+        user.city = _user['city']
+        user.street = _user['street']
+        user.location = _user['location']
+        user.save()
         token = RefreshToken.for_user(user).access_token
         print(str(token))
         print(settings.SECRET_KEY)
@@ -54,8 +62,12 @@ class RegisterView(generics.GenericAPIView):
         if _user['role'] == 'SLR':
             print("*********** IT'S A SELLER ************")
             print(_user['storename'])
-            print(_user['location'])
-            new_store = Store.objects.create(owner=user, name=_user['storename'], location=_user['location'])
+            new_store = Store.objects.create(
+                owner=user, 
+                name=_user['storename'], 
+                account_holder_name = _user['account_holder_name'],
+                account_number = _user['account_number'],
+                name_of_bank = _user['name_of_bank'])
             new_store.save()
 
         return Response(user_data, status=status.HTTP_201_CREATED)
@@ -124,13 +136,17 @@ class CardInfoAPIView(APIView):
         return cards
     
     def get(self, request):
-        cards = self.get_queryset()
-        serializer = CardInfoSerializer(cards, many=True)
+        user = request.query_params['user']
+        try:
+            card = Card_Information.objects.get(user__email=user)
+        except:
+            return Response({'message':'card information not found'}, status=status.HTTP_204_NO_CONTENT)
+        serializer = CardInfoSerializer(card)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         card_data = request.data
-        user = User.objects.get(pk=card_data['user'])
+        user = User.objects.get(email=card_data['user'])
         new_card = Card_Information.objects.create(
             user = user,
             card_number = card_data['card_number'],
@@ -139,8 +155,7 @@ class CardInfoAPIView(APIView):
             cvv = card_data['cvv']
         )
         new_card.save()
-        serializer = CardInfoSerializer(new_card)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({'message': 'card infomation successfully created'}, status=status.HTTP_201_CREATED)
 
 
 class StoreAPIView(APIView):
@@ -156,3 +171,18 @@ class StoreAPIView(APIView):
         store = Store.objects.get(owner__email = user_email)
         serializer = StoreSerializer(store)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        data = request.data
+        store = Store.objects.get(id=data['id'])
+        if data['update_type'] == 'info':
+            pass
+        elif data['update_type'] == 'revenue':
+            store.products_sold = data['products_sold']
+            store.total_revenue = data['total_revenue']
+        elif data['update_type'] == 'rating':
+            store.rating_num = data['rating_num']
+            store.rating = data['rating']
+        store.save()
+        return Response({'message': 'product successfully updated'}, status=status.HTTP_200_OK)
+        

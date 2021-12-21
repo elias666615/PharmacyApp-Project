@@ -59,6 +59,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30, null=False, blank=False, default="first_name")
     last_name = models.CharField(max_length=30, null=False, blank=False, default="last_name")
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
+    city = models.CharField(max_length=50, null=True, blank=False)
+    street = models.CharField(max_length=50, null=True, blank=False)
+    location = models.TextField(null=True, blank=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -91,7 +94,14 @@ class Card_Information(models.Model):
 class Store(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
     name = models.CharField(max_length=50, null=False, blank=False)
-    location = models.TextField(null=False, blank=False)
+    rating = models.PositiveIntegerField(default=0)
+    rating_num = models.PositiveIntegerField(default=0)
+    products_sold = models.BigIntegerField(default=0)
+    total_revenue = models.BigIntegerField(default=0)
+    account_holder_name = models.CharField(max_length=50, null=True, blank=False)
+    account_number = models.CharField(max_length=50, null=True, blank=False)
+    name_of_bank = models.CharField(max_length=50, null=True, blank=False)
+
 
     def __str__(self):
         return self.name

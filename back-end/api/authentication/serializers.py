@@ -8,7 +8,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     role=serializers.CharField(max_length=3)
     class Meta:
         model = User
-        fields = ['email', 'password', 'first_name', 'last_name', 'phone_number', 'role']
+        fields = ['email', 'password', 'first_name', 'last_name', 'phone_number', 'role', 'city', 'street', 'location']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -16,6 +16,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         last_name = attrs.get('last_name', '')
         phone_number = attrs.get('phone_number', '')
         role = attrs.get('role', '')
+        city = attrs.get('city', '')
+        street = attrs.get('street', '')
+        location = attrs.get('location', '')
         return attrs
 
     def create(self, validated_data):
@@ -70,7 +73,7 @@ class CardInfoSerializer(serializers.ModelSerializer):
 class StoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Store
-        fields = ['id', 'name', 'location']
+        fields = ['id', 'name', 'rating', 'products_sold', 'total_revenue', 'account_holder_name', 'account_number', 'name_of_bank']
 
 
 class UserSerializer(serializers.ModelSerializer):
