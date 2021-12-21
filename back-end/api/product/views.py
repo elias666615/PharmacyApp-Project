@@ -149,7 +149,6 @@ class CommercialProductAPIView(APIView):
 
     def get(self, request):
         type = request.query_params['type']
-        category = request.query_params['category']
 
         if(type == 'top'):
             products = Product.objects.filter(quantity__gt=0).order_by('-overall_rating')[:8]
@@ -162,7 +161,13 @@ class CommercialProductAPIView(APIView):
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif type == 'category':
-            pass
+            category = request.query_params['category']
+        elif type == 'search':
+            search = request.query_params['search']
+            products = Product.objects.filter(name__contains=search)
+            serializer = ProductSerializer(products, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+            
 
 
 class RatingAPIView(APIView):
