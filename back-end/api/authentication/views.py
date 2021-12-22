@@ -29,7 +29,6 @@ class RegisterView(generics.GenericAPIView):
         user_data = serializer.data
 
         user=User.objects.get(email=user_data['email'])
-        print('**********************')
         print(_user['city'])
         print(_user['street'])
         print(_user['location'])
@@ -60,8 +59,6 @@ class RegisterView(generics.GenericAPIView):
         # Util.sendEmail(data)
 
         if _user['role'] == 'SLR':
-            print("*********** IT'S A SELLER ************")
-            print(_user['storename'])
             new_store = Store.objects.create(
                 owner=user, 
                 name=_user['storename'], 
@@ -88,7 +85,6 @@ class LoginAPIView(generics.GenericAPIView):
 
 class UserAPIView(APIView):
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]
 
     def get(self, request):
         email = request.query_params['email']
@@ -160,7 +156,6 @@ class CardInfoAPIView(APIView):
 
 class StoreAPIView(APIView):
     serializer_class = StoreSerializer
-    permission_classes = [AllowAny]
 
     def get_queryset(self):
         stores = Store.objects.all()
@@ -184,5 +179,5 @@ class StoreAPIView(APIView):
             store.rating_num = data['rating_num']
             store.rating = data['rating']
         store.save()
-        return Response({'message': 'product successfully updated'}, status=status.HTTP_200_OK)
+        return Response({'message': 'store successfully updated'}, status=status.HTTP_200_OK)
         

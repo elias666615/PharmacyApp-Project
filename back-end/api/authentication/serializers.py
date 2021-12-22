@@ -79,5 +79,5 @@ class StoreSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email', 'phone_number', 'first_name', 'last_name', 'role']
+        fields = ['email', 'phone_number', 'first_name', 'last_name', 'role', 'city', 'street', 'location']
         depth = 1
