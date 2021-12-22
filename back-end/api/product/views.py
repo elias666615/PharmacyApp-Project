@@ -153,8 +153,6 @@ class CommercialProductAPIView(APIView):
 
         if(type == 'top'):
             products = Product.objects.filter(quantity__gt=0).order_by('-overall_rating')[:8]
-            print('*******************************')
-            print(products)
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif type == 'sold_out':
@@ -162,7 +160,12 @@ class CommercialProductAPIView(APIView):
             serializer = ProductSerializer(products, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif type == 'category':
-            category = request.query_params['category']
+            category_id = request.query_params['category']
+            products = Product.objects.filter(categories=category_id).order_by('-overall_rating')[:8]
+            print('*****************NOW**************')
+            print(products)
+            serializer = ProductSerializer(products, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         elif type == 'search':
             search = request.query_params['search']
             products = Product.objects.filter(name__contains=search)

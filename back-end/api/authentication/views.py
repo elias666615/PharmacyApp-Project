@@ -85,6 +85,7 @@ class LoginAPIView(generics.GenericAPIView):
 
 class UserAPIView(APIView):
     serializer_class = UserSerializer
+    permission_class = AllowAny
 
     def get(self, request):
         email = request.query_params['email']
@@ -156,6 +157,7 @@ class CardInfoAPIView(APIView):
 
 class StoreAPIView(APIView):
     serializer_class = StoreSerializer
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         stores = Store.objects.all()
