@@ -322,14 +322,14 @@ class ProductAPIView(APIView):
             product_object.price_per_unit = data['price_per_unit']
             product_object.discount = data['discount']
             product_object.initial_quantity = data['initial_quantity']
-            # product_object.image = data['image']
+            if int(data['picture_changed']) == 1:
+                product_object.image = data['image']
 
             tagList = []
             for tag in data['tags'].split(','):
                 tag = tag.strip()
                 if tag == '':
                     continue
-                print(tag)
                 tagList.append(int(tag))
             categoryList = []
             for category in data['categories'].split(','):
@@ -349,8 +349,9 @@ class ProductAPIView(APIView):
             product_object.save()
 
         elif data['update_type'] == 'update_quantity':
-            product_object.sold_quantity = data['sold_quantity']
-            product_object.quantity = data['quantity']
+            print('*************** QUANTITY *****************')
+            product_object.sold_quantity = int(data['sold_quantity'])
+            product_object.quantity = int(data['quantity'])
 
         Serializer = ProductSerializer(product_object)
         return Response(Serializer.data, status=status.HTTP_200_OK)
